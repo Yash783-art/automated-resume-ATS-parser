@@ -1,0 +1,596 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .doc { padding: 0 0 2rem; }
+  .hero { background: #0F172A; color: #F1F5F9; padding: 2rem 1.5rem 1.5rem; border-radius: var(--border-radius-lg); margin-bottom: 1.5rem; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 220px; height: 220px; border-radius: 50%; background: rgba(99,102,241,0.15); pointer-events: none; }
+  .hero::after { content: ''; position: absolute; bottom: -40px; left: 30%; width: 180px; height: 180px; border-radius: 50%; background: rgba(16,185,129,0.08); pointer-events: none; }
+  .hero-tag { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #6366F1; background: rgba(99,102,241,0.15); padding: 4px 10px; border-radius: 20px; display: inline-block; margin-bottom: 12px; }
+  .hero h1 { font-size: 26px; font-weight: 500; line-height: 1.2; margin-bottom: 8px; }
+  .hero h1 span { color: #6366F1; }
+  .hero p { font-size: 13px; color: #94A3B8; line-height: 1.6; max-width: 480px; }
+  .hero-meta { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+  .hero-badge { font-size: 11px; color: #64748B; background: rgba(255,255,255,0.06); border: 0.5px solid rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 20px; }
+  .section { margin-bottom: 1.5rem; }
+  .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .section-num { font-size: 11px; font-weight: 500; color: #6366F1; background: rgba(99,102,241,0.1); padding: 2px 7px; border-radius: 10px; }
+  .section-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
+  .analysis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+  .proj-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; }
+  .proj-logo { width: 32px; height: 32px; border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; }
+  .proj-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; }
+  .proj-tag { font-size: 10px; color: var(--color-text-secondary); background: var(--color-background-secondary); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 8px; }
+  .trait-list { list-style: none; }
+  .trait-list li { font-size: 12px; color: var(--color-text-secondary); padding: 3px 0; display: flex; align-items: flex-start; gap: 6px; line-height: 1.4; }
+  .trait-list li::before { content: '–'; color: #6366F1; flex-shrink: 0; margin-top: 1px; }
+  .palette-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: flex-start; }
+  .swatch-group { display: flex; flex-direction: column; gap: 3px; }
+  .swatch-label { font-size: 10px; color: var(--color-text-secondary); }
+  .swatch-row { display: flex; gap: 2px; }
+  .swatch { width: 28px; height: 28px; border-radius: 5px; cursor: pointer; transition: transform 0.1s; position: relative; }
+  .swatch:hover { transform: scale(1.15); z-index: 2; }
+  .swatch-hex { position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%); font-size: 9px; color: var(--color-text-secondary); white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.15s; }
+  .swatch:hover .swatch-hex { opacity: 1; }
+  .type-showcase { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .type-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; }
+  .type-meta { font-size: 10px; color: var(--color-text-secondary); margin-bottom: 6px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; }
+  .type-sample { line-height: 1.3; color: var(--color-text-primary); }
+  .component-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+  .comp-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; }
+  .comp-label { font-size: 10px; color: var(--color-text-secondary); margin-bottom: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+  .btn-primary { background: #6366F1; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s; }
+  .btn-primary:hover { background: #4F46E5; }
+  .btn-secondary { background: transparent; color: var(--color-text-primary); border: 0.5px solid var(--color-border-secondary); padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; transition: background 0.15s; }
+  .btn-secondary:hover { background: var(--color-background-secondary); }
+  .btn-ghost { background: transparent; color: #6366F1; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .input-demo { width: 100%; padding: 8px 12px; border-radius: 8px; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); font-size: 13px; color: var(--color-text-primary); outline: none; transition: border 0.15s; }
+  .input-demo:focus { border-color: #6366F1; }
+  .score-bar { display: flex; flex-direction: column; gap: 6px; }
+  .score-row { display: flex; align-items: center; gap: 8px; }
+  .score-name { font-size: 12px; color: var(--color-text-secondary); width: 80px; flex-shrink: 0; }
+  .score-track { flex: 1; height: 6px; background: var(--color-background-secondary); border-radius: 3px; overflow: hidden; }
+  .score-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+  .score-pct { font-size: 11px; font-weight: 500; width: 32px; text-align: right; }
+  .skill-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+  .skill-tag { font-size: 11px; padding: 3px 8px; border-radius: 20px; font-weight: 500; }
+  .tag-match { background: rgba(16,185,129,0.12); color: #059669; }
+  .tag-missing { background: rgba(239,68,68,0.1); color: #DC2626; }
+  .tag-neutral { background: var(--color-background-secondary); color: var(--color-text-secondary); }
+  .upload-zone { border: 1.5px dashed var(--color-border-secondary); border-radius: var(--border-radius-lg); padding: 20px; text-align: center; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+  .upload-zone:hover { border-color: #6366F1; background: rgba(99,102,241,0.03); }
+  .upload-icon { font-size: 24px; color: #6366F1; margin-bottom: 6px; }
+  .upload-text { font-size: 13px; color: var(--color-text-secondary); }
+  .upload-hint { font-size: 11px; color: var(--color-text-secondary); margin-top: 4px; opacity: 0.6; }
+  .score-ring { display: flex; align-items: center; gap: 16px; }
+  .ring-wrap { position: relative; width: 72px; height: 72px; flex-shrink: 0; }
+  .ring-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+  .ring-detail { flex: 1; }
+  .ring-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 2px; }
+  .ring-sub { font-size: 12px; color: var(--color-text-secondary); }
+  .nav-demo { display: flex; align-items: center; gap: 16px; padding: 10px 0; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 10px; }
+  .nav-logo { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+  .nav-logo span { color: #6366F1; }
+  .nav-links { display: flex; gap: 12px; margin-left: auto; }
+  .nav-link { font-size: 12px; color: var(--color-text-secondary); cursor: pointer; padding: 4px 8px; border-radius: 6px; }
+  .nav-link.active { color: #6366F1; background: rgba(99,102,241,0.08); }
+  .spec-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .spec-table th { text-align: left; padding: 6px 8px; color: var(--color-text-secondary); font-weight: 500; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .spec-table td { padding: 8px; border-bottom: 0.5px solid var(--color-border-tertiary); color: var(--color-text-primary); vertical-align: top; }
+  .spec-table tr:last-child td { border-bottom: none; }
+  .token { font-family: var(--font-mono); font-size: 11px; background: var(--color-background-secondary); padding: 2px 5px; border-radius: 4px; color: var(--color-text-secondary); }
+  .spacing-demo { display: flex; flex-direction: column; gap: 6px; }
+  .spacing-row { display: flex; align-items: center; gap: 10px; }
+  .spacing-bar { height: 8px; background: rgba(99,102,241,0.25); border-radius: 2px; }
+  .spacing-val { font-size: 11px; color: var(--color-text-secondary); min-width: 40px; }
+  .spacing-name { font-size: 11px; color: var(--color-text-primary); }
+  .icon-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .icon-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px; border-radius: 8px; background: var(--color-background-secondary); min-width: 48px; }
+  .icon-item i { font-size: 18px; color: #6366F1; }
+  .icon-item span { font-size: 10px; color: var(--color-text-secondary); }
+  .influence-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .inf-pill { font-size: 11px; padding: 4px 10px; border-radius: 20px; border: 0.5px solid var(--color-border-tertiary); color: var(--color-text-secondary); background: var(--color-background-primary); cursor: pointer; transition: all 0.15s; }
+  .inf-pill:hover, .inf-pill.active { border-color: #6366F1; color: #6366F1; background: rgba(99,102,241,0.07); }
+  .summary-box { background: rgba(99,102,241,0.06); border: 0.5px solid rgba(99,102,241,0.2); border-radius: var(--border-radius-lg); padding: 1rem; margin-bottom: 1.5rem; }
+  .summary-box h3 { font-size: 13px; font-weight: 500; color: #6366F1; margin-bottom: 6px; }
+  .summary-box p { font-size: 12px; color: var(--color-text-secondary); line-height: 1.6; }
+  .motion-demo { display: flex; flex-direction: column; gap: 8px; }
+  .motion-row { display: flex; align-items: center; gap: 12px; }
+  .motion-name { font-size: 12px; color: var(--color-text-secondary); width: 100px; flex-shrink: 0; }
+  .motion-bar-wrap { flex: 1; height: 6px; background: var(--color-background-secondary); border-radius: 3px; overflow: hidden; cursor: pointer; }
+  .motion-bar { height: 100%; width: 0%; background: #6366F1; border-radius: 3px; }
+  .animate-ease-out { transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+  .animate-spring { transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .animate-linear { transition: width 0.3s linear; }
+  .animate-ease-in { transition: width 0.35s cubic-bezier(0.55, 0.055, 0.675, 0.19); }
+  .motion-val { font-size: 11px; color: var(--color-text-secondary); width: 80px; text-align: right; }
+</style>
+
+<div class="doc">
+  <h2 class="sr-only">ATS Parser Design Document — synthesized from Resume-Matcher, Resume Parser Project, and Open Resume aesthetic analysis</h2>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-tag">Design Document v1.0</div>
+    <h1>ATS Parser<br><span>Design System</span></h1>
+    <p>A unified design language synthesized from Resume-Matcher (srbhr), Abdul Talha's Resume Parser, and Open Resume — optimised for clarity, trust, and speed.</p>
+    <div class="hero-meta">
+      <span class="hero-badge">May 2026</span>
+      <span class="hero-badge">Inspired by 3 open-source projects</span>
+      <span class="hero-badge">React + Tailwind</span>
+      <span class="hero-badge">WCAG AA</span>
+    </div>
+  </div>
+
+  <!-- Synthesis Summary -->
+  <div class="summary-box">
+    <h3>Design synthesis rationale</h3>
+    <p>Resume-Matcher uses a deep navy/indigo dark-tech tone with bold personality copy and a Next.js frontend (#1d4ed8 brand blue, Astro-built landing). Abdul Talha's project takes a data-first, structured approach — clean tables, minimal chrome. Open Resume is famously minimal: white-dominant, Inter typography, generous whitespace, blue-accent system. Synthesising all three: we get a <strong style="color:#6366F1">light-first, indigo-accented system</strong> with high information density on results screens, generous breathing room on onboarding, and a slightly bold personality that doesn't take itself too seriously.</p>
+  </div>
+
+  <!-- 1. Source Analysis -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <span class="section-title">Source project analysis</span>
+    </div>
+    <div class="analysis-grid">
+      <div class="proj-card">
+        <div class="proj-logo" style="background:rgba(29,78,216,0.12); color:#1d4ed8;">RM</div>
+        <div class="proj-name">Resume-Matcher</div>
+        <div class="proj-tag">srbhr · 26k ★ · Next.js + Astro</div>
+        <ul class="trait-list">
+          <li>Brand blue #1d4ed8, deep navy backgrounds</li>
+          <li>Bold personality in copy, "vibes" culture</li>
+          <li>Clean card-based layout, minimal chrome</li>
+          <li>Keyword highlight + score dashboard</li>
+          <li>Strong open-source / community energy</li>
+          <li>Streamlit prototype → Next.js production</li>
+        </ul>
+      </div>
+      <div class="proj-card">
+        <div class="proj-logo" style="background:rgba(16,185,129,0.12); color:#059669;">RP</div>
+        <div class="proj-name">Resume Parser</div>
+        <div class="proj-tag">Abdul Talha · Data-first</div>
+        <ul class="trait-list">
+          <li>Utility-focused, no-frills structure</li>
+          <li>Table & list layouts for extracted data</li>
+          <li>Section-based parsing: skills, edu, exp</li>
+          <li>Green success / red missing indicators</li>
+          <li>Dense information display, small font sizes</li>
+          <li>Developer-oriented aesthetic</li>
+        </ul>
+      </div>
+      <div class="proj-card">
+        <div class="proj-logo" style="background:rgba(99,102,241,0.12); color:#6366F1;">OR</div>
+        <div class="proj-name">Open Resume</div>
+        <div class="proj-tag">open-resume.com · Minimal</div>
+        <ul class="trait-list">
+          <li>White-dominant, generous whitespace</li>
+          <li>Inter font, strict typographic hierarchy</li>
+          <li>Blue-600 primary accent, neutral grays</li>
+          <li>Left-sidebar nav, two-column layouts</li>
+          <li>Clean pill/badge component language</li>
+          <li>PDF-first, print-ready design thinking</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Color System -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <span class="section-title">Color system</span>
+    </div>
+    <div class="palette-row" style="margin-bottom:16px;">
+      <div class="swatch-group">
+        <div class="swatch-label">Primary — Indigo</div>
+        <div class="swatch-row">
+          <div class="swatch" style="background:#EEF2FF"><div class="swatch-hex">#EEF2FF</div></div>
+          <div class="swatch" style="background:#C7D2FE"><div class="swatch-hex">#C7D2FE</div></div>
+          <div class="swatch" style="background:#A5B4FC"><div class="swatch-hex">#A5B4FC</div></div>
+          <div class="swatch" style="background:#818CF8"><div class="swatch-hex">#818CF8</div></div>
+          <div class="swatch" style="background:#6366F1"><div class="swatch-hex">#6366F1</div></div>
+          <div class="swatch" style="background:#4F46E5"><div class="swatch-hex">#4F46E5</div></div>
+          <div class="swatch" style="background:#3730A3"><div class="swatch-hex">#3730A3</div></div>
+        </div>
+      </div>
+      <div class="swatch-group">
+        <div class="swatch-label">Surface — Slate</div>
+        <div class="swatch-row">
+          <div class="swatch" style="background:#F8FAFC"><div class="swatch-hex">#F8FAFC</div></div>
+          <div class="swatch" style="background:#F1F5F9"><div class="swatch-hex">#F1F5F9</div></div>
+          <div class="swatch" style="background:#E2E8F0"><div class="swatch-hex">#E2E8F0</div></div>
+          <div class="swatch" style="background:#94A3B8"><div class="swatch-hex">#94A3B8</div></div>
+          <div class="swatch" style="background:#475569"><div class="swatch-hex">#475569</div></div>
+          <div class="swatch" style="background:#1E293B"><div class="swatch-hex">#1E293B</div></div>
+          <div class="swatch" style="background:#0F172A"><div class="swatch-hex">#0F172A</div></div>
+        </div>
+      </div>
+      <div class="swatch-group">
+        <div class="swatch-label">Success — Emerald</div>
+        <div class="swatch-row">
+          <div class="swatch" style="background:#ECFDF5"><div class="swatch-hex">#ECFDF5</div></div>
+          <div class="swatch" style="background:#A7F3D0"><div class="swatch-hex">#A7F3D0</div></div>
+          <div class="swatch" style="background:#10B981"><div class="swatch-hex">#10B981</div></div>
+          <div class="swatch" style="background:#059669"><div class="swatch-hex">#059669</div></div>
+        </div>
+      </div>
+      <div class="swatch-group">
+        <div class="swatch-label">Danger — Rose</div>
+        <div class="swatch-row">
+          <div class="swatch" style="background:#FFF1F2"><div class="swatch-hex">#FFF1F2</div></div>
+          <div class="swatch" style="background:#FECDD3"><div class="swatch-hex">#FECDD3</div></div>
+          <div class="swatch" style="background:#F43F5E"><div class="swatch-hex">#F43F5E</div></div>
+          <div class="swatch" style="background:#E11D48"><div class="swatch-hex">#E11D48</div></div>
+        </div>
+      </div>
+      <div class="swatch-group">
+        <div class="swatch-label">Warning — Amber</div>
+        <div class="swatch-row">
+          <div class="swatch" style="background:#FFFBEB"><div class="swatch-hex">#FFFBEB</div></div>
+          <div class="swatch" style="background:#FDE68A"><div class="swatch-hex">#FDE68A</div></div>
+          <div class="swatch" style="background:#F59E0B"><div class="swatch-hex">#F59E0B</div></div>
+          <div class="swatch" style="background:#D97706"><div class="swatch-hex">#D97706</div></div>
+        </div>
+      </div>
+    </div>
+    <table class="spec-table">
+      <thead><tr><th>Token</th><th>Value</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td><span class="token">--color-primary</span></td><td>#6366F1</td><td>CTA buttons, active nav, links, score accents</td></tr>
+        <tr><td><span class="token">--color-primary-dark</span></td><td>#4F46E5</td><td>Hover states on primary elements</td></tr>
+        <tr><td><span class="token">--color-bg</span></td><td>#F8FAFC</td><td>Page background</td></tr>
+        <tr><td><span class="token">--color-surface</span></td><td>#FFFFFF</td><td>Card, panel, dialog backgrounds</td></tr>
+        <tr><td><span class="token">--color-border</span></td><td>#E2E8F0</td><td>Dividers, card outlines, inputs</td></tr>
+        <tr><td><span class="token">--color-match</span></td><td>#10B981</td><td>Matched keywords, success states</td></tr>
+        <tr><td><span class="token">--color-missing</span></td><td>#F43F5E</td><td>Missing keywords, error states</td></tr>
+        <tr><td><span class="token">--color-text-head</span></td><td>#0F172A</td><td>Headings, display text</td></tr>
+        <tr><td><span class="token">--color-text-body</span></td><td>#475569</td><td>Body copy, descriptions</td></tr>
+        <tr><td><span class="token">--color-text-muted</span></td><td>#94A3B8</td><td>Labels, captions, hints</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. Typography -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <span class="section-title">Typography</span>
+    </div>
+    <div style="margin-bottom:12px; padding:10px; background:var(--color-background-secondary); border-radius:8px; font-size:12px; color:var(--color-text-secondary);">
+      <strong style="color:var(--color-text-primary);">Font stack:</strong> <span class="token">'Geist', 'DM Sans', system-ui, sans-serif</span> — Influenced by Open Resume's Inter precision and Resume-Matcher's modern developer aesthetic. Geist/DM Sans for crisp readability at small sizes on data-dense screens. Mono: <span class="token">'Geist Mono', 'JetBrains Mono'</span> for scores, percentages, code.
+    </div>
+    <div class="type-showcase">
+      <div class="type-card">
+        <div class="type-meta">Display / H1 — 28px / 500</div>
+        <div class="type-sample" style="font-size:22px; font-weight:500; color:var(--color-text-primary); line-height:1.2;">Resume Analysis<br>Results</div>
+      </div>
+      <div class="type-card">
+        <div class="type-meta">Heading / H2 — 18px / 500</div>
+        <div class="type-sample" style="font-size:18px; font-weight:500; color:var(--color-text-primary); line-height:1.3;">Skills Match Score</div>
+        <div style="font-size:13px; color:var(--color-text-secondary); margin-top:4px;">Section headers, panel titles</div>
+      </div>
+      <div class="type-card">
+        <div class="type-meta">Body — 14px / 400</div>
+        <div class="type-sample" style="font-size:14px; color:#475569; line-height:1.6;">Extracted 12 matching skills from your resume. 3 required skills are missing. Consider adding React, TypeScript, and AWS to your resume.</div>
+      </div>
+      <div class="type-card">
+        <div class="type-meta">Score / Mono — 32px / 500</div>
+        <div class="type-sample" style="font-size:32px; font-weight:500; color:#6366F1; font-family:monospace; line-height:1;">87%</div>
+        <div style="font-size:12px; color:var(--color-text-secondary); margin-top:4px;">Match scores, percentages</div>
+      </div>
+    </div>
+    <div style="margin-top:10px;">
+      <table class="spec-table">
+        <thead><tr><th>Role</th><th>Size</th><th>Weight</th><th>Line-height</th><th>Color token</th></tr></thead>
+        <tbody>
+          <tr><td>Display</td><td>28–32px</td><td>500</td><td>1.2</td><td>--color-text-head</td></tr>
+          <tr><td>H1</td><td>22px</td><td>500</td><td>1.3</td><td>--color-text-head</td></tr>
+          <tr><td>H2</td><td>18px</td><td>500</td><td>1.4</td><td>--color-text-head</td></tr>
+          <tr><td>H3</td><td>15px</td><td>500</td><td>1.4</td><td>--color-text-head</td></tr>
+          <tr><td>Body</td><td>14px</td><td>400</td><td>1.6</td><td>--color-text-body</td></tr>
+          <tr><td>Caption / Label</td><td>12px</td><td>400</td><td>1.5</td><td>--color-text-muted</td></tr>
+          <tr><td>Score / Metric</td><td>24–32px</td><td>500</td><td>1</td><td>--color-primary</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 4. Components -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <span class="section-title">Component library</span>
+    </div>
+
+    <!-- Nav -->
+    <div class="comp-card" style="margin-bottom:10px;">
+      <div class="comp-label">Navigation bar</div>
+      <div class="nav-demo">
+        <span class="nav-logo">ATS<span>Parser</span></span>
+        <span class="nav-link active">Dashboard</span>
+        <span class="nav-link">Candidates</span>
+        <span class="nav-link">Job Descriptions</span>
+        <span class="nav-link">Reports</span>
+        <button class="btn-primary" style="padding:6px 14px; font-size:12px; margin-left:8px;">Upload Resume</button>
+      </div>
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-top:4px;">White surface, 0.5px border-bottom, indigo active indicator, sticky top</div>
+    </div>
+
+    <div class="component-grid">
+      <!-- Buttons -->
+      <div class="comp-card">
+        <div class="comp-label">Buttons</div>
+        <div class="btn-row" style="flex-direction:column; gap:6px; align-items:flex-start;">
+          <button class="btn-primary">Analyze Resume</button>
+          <button class="btn-secondary">View Report</button>
+          <button class="btn-ghost">Skip for now</button>
+        </div>
+      </div>
+
+      <!-- Input -->
+      <div class="comp-card">
+        <div class="comp-label">Form inputs</div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div>
+            <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:4px;">Job title filter</div>
+            <input class="input-demo" type="text" placeholder="e.g. Senior Frontend Engineer" />
+          </div>
+          <div style="display:flex; gap:6px;">
+            <span class="skill-tag tag-match">React ✓</span>
+            <span class="skill-tag tag-missing">AWS ✗</span>
+            <span class="skill-tag tag-neutral">Python</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload zone -->
+      <div class="comp-card">
+        <div class="comp-label">Upload zone</div>
+        <div class="upload-zone">
+          <div class="upload-icon"><i class="ti ti-cloud-upload" aria-hidden="true"></i></div>
+          <div class="upload-text">Drop PDF resume here</div>
+          <div class="upload-hint">PDF · max 10MB · batch up to 10</div>
+        </div>
+      </div>
+
+      <!-- Score ring + bar -->
+      <div class="comp-card">
+        <div class="comp-label">Match score</div>
+        <div class="score-ring" style="margin-bottom:12px;">
+          <div class="ring-wrap">
+            <svg width="72" height="72" viewBox="0 0 72 72">
+              <circle cx="36" cy="36" r="28" fill="none" stroke="#E2E8F0" stroke-width="7"/>
+              <circle cx="36" cy="36" r="28" fill="none" stroke="#6366F1" stroke-width="7" stroke-dasharray="175.9" stroke-dashoffset="22.4" stroke-linecap="round" transform="rotate(-90 36 36)"/>
+            </svg>
+            <div class="ring-label">87</div>
+          </div>
+          <div class="ring-detail">
+            <div class="ring-title">Strong Match</div>
+            <div class="ring-sub">3 skills missing · 2 exp gaps</div>
+          </div>
+        </div>
+        <div class="score-bar">
+          <div class="score-row"><span class="score-name">Skills</span><div class="score-track"><div class="score-fill" style="width:91%; background:#6366F1;"></div></div><span class="score-pct" style="color:#6366F1;">91%</span></div>
+          <div class="score-row"><span class="score-name">Experience</span><div class="score-track"><div class="score-fill" style="width:83%; background:#6366F1;"></div></div><span class="score-pct" style="color:#6366F1;">83%</span></div>
+          <div class="score-row"><span class="score-name">Education</span><div class="score-track"><div class="score-fill" style="width:100%; background:#10B981;"></div></div><span class="score-pct" style="color:#10B981;">100%</span></div>
+        </div>
+      </div>
+
+      <!-- Skill tags -->
+      <div class="comp-card">
+        <div class="comp-label">Keyword tags</div>
+        <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:6px;">Matched (12)</div>
+        <div class="skill-tags" style="margin-bottom:10px;">
+          <span class="skill-tag tag-match">React</span>
+          <span class="skill-tag tag-match">TypeScript</span>
+          <span class="skill-tag tag-match">Node.js</span>
+          <span class="skill-tag tag-match">REST APIs</span>
+          <span class="skill-tag tag-match">Git</span>
+        </div>
+        <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:6px;">Missing (3)</div>
+        <div class="skill-tags">
+          <span class="skill-tag tag-missing">AWS</span>
+          <span class="skill-tag tag-missing">Kubernetes</span>
+          <span class="skill-tag tag-missing">PostgreSQL</span>
+        </div>
+      </div>
+
+      <!-- Icons -->
+      <div class="comp-card">
+        <div class="comp-label">Icon set — Tabler outline</div>
+        <div class="icon-grid">
+          <div class="icon-item"><i class="ti ti-file-text" aria-hidden="true"></i><span>resume</span></div>
+          <div class="icon-item"><i class="ti ti-chart-bar" aria-hidden="true"></i><span>score</span></div>
+          <div class="icon-item"><i class="ti ti-cloud-upload" aria-hidden="true"></i><span>upload</span></div>
+          <div class="icon-item"><i class="ti ti-user-check" aria-hidden="true"></i><span>match</span></div>
+          <div class="icon-item"><i class="ti ti-briefcase" aria-hidden="true"></i><span>job</span></div>
+          <div class="icon-item"><i class="ti ti-download" aria-hidden="true"></i><span>export</span></div>
+          <div class="icon-item"><i class="ti ti-search" aria-hidden="true"></i><span>search</span></div>
+          <div class="icon-item"><i class="ti ti-settings" aria-hidden="true"></i><span>settings</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Spacing -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <span class="section-title">Spacing & layout</span>
+    </div>
+    <div class="comp-card" style="margin-bottom:10px;">
+      <div class="comp-label">Spacing scale (4px base)</div>
+      <div class="spacing-demo">
+        <div class="spacing-row"><div class="spacing-bar" style="width:4px;"></div><span class="spacing-val">4px</span><span class="spacing-name">xs — icon gap, inline</span></div>
+        <div class="spacing-row"><div class="spacing-bar" style="width:8px;"></div><span class="spacing-val">8px</span><span class="spacing-name">sm — tag gap, button padding-y</span></div>
+        <div class="spacing-row"><div class="spacing-bar" style="width:12px;"></div><span class="spacing-val">12px</span><span class="spacing-name">md — form element gap</span></div>
+        <div class="spacing-row"><div class="spacing-bar" style="width:16px;"></div><span class="spacing-val">16px</span><span class="spacing-name">lg — card padding, section gap</span></div>
+        <div class="spacing-row"><div class="spacing-bar" style="width:24px;"></div><span class="spacing-val">24px</span><span class="spacing-name">xl — panel padding, row gap</span></div>
+        <div class="spacing-row"><div class="spacing-bar" style="width:32px;"></div><span class="spacing-val">32px</span><span class="spacing-name">2xl — section break</span></div>
+        <div class="spacing-row"><div class="spacing-bar" style="width:48px;"></div><span class="spacing-val">48px</span><span class="spacing-name">3xl — page section gap</span></div>
+      </div>
+    </div>
+    <table class="spec-table">
+      <thead><tr><th>Token</th><th>Value</th><th>Context</th></tr></thead>
+      <tbody>
+        <tr><td><span class="token">--radius-sm</span></td><td>6px</td><td>Tags, badges, small inputs</td></tr>
+        <tr><td><span class="token">--radius-md</span></td><td>10px</td><td>Buttons, form inputs, chips</td></tr>
+        <tr><td><span class="token">--radius-lg</span></td><td>14px</td><td>Cards, panels, modals</td></tr>
+        <tr><td><span class="token">--radius-xl</span></td><td>20px</td><td>Upload zone, hero sections</td></tr>
+        <tr><td><span class="token">--radius-full</span></td><td>9999px</td><td>Avatars, score rings, pills</td></tr>
+        <tr><td><span class="token">--shadow-card</span></td><td>0 1px 3px rgba(0,0,0,0.06)</td><td>Elevated cards, dropdowns</td></tr>
+        <tr><td><span class="token">--shadow-focus</span></td><td>0 0 0 3px rgba(99,102,241,0.2)</td><td>Focus ring on all interactive elements</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 6. Motion -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <span class="section-title">Motion & animation</span>
+    </div>
+    <div class="comp-card">
+      <div class="comp-label">Easing curves — click a row to animate</div>
+      <div class="motion-demo" id="motion-demo">
+        <div class="motion-row" onclick="playMotion('bar-ease-out','animate-ease-out')">
+          <span class="motion-name">Ease-out (default)</span>
+          <div class="motion-bar-wrap"><div class="motion-bar animate-ease-out" id="bar-ease-out"></div></div>
+          <span class="motion-val">400ms · ease-out</span>
+        </div>
+        <div class="motion-row" onclick="playMotion('bar-spring','animate-spring')">
+          <span class="motion-name">Spring (score reveal)</span>
+          <div class="motion-bar-wrap"><div class="motion-bar animate-spring" id="bar-spring"></div></div>
+          <span class="motion-val">500ms · spring</span>
+        </div>
+        <div class="motion-row" onclick="playMotion('bar-linear','animate-linear')">
+          <span class="motion-name">Linear (progress bars)</span>
+          <div class="motion-bar-wrap"><div class="motion-bar animate-linear" id="bar-linear"></div></div>
+          <span class="motion-val">300ms · linear</span>
+        </div>
+        <div class="motion-row" onclick="playMotion('bar-ease-in','animate-ease-in')">
+          <span class="motion-name">Ease-in (exit)</span>
+          <div class="motion-bar-wrap"><div class="motion-bar animate-ease-in" id="bar-ease-in"></div></div>
+          <span class="motion-val">350ms · ease-in</span>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:10px; font-size:12px; color:var(--color-text-secondary); line-height:1.6; padding:0 4px;">
+      Key animations: score ring counter (0→N, 800ms ease-out), skill tag stagger reveal (50ms delay per tag), upload progress bar (linear), match percentage counter (spring overshoot). All animations respect <span class="token">prefers-reduced-motion</span>.
+    </div>
+  </div>
+
+  <!-- 7. Page Templates -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <span class="section-title">Page templates & layout rules</span>
+    </div>
+    <table class="spec-table">
+      <thead><tr><th>Screen</th><th>Layout</th><th>Key design decisions</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Landing / Home</strong></td><td>Full-width, centered hero</td><td>Bold headline, two CTAs (HR / Job Seeker), personality-first copy influenced by Resume-Matcher's tone. Dark hero block (#0F172A), white below.</td></tr>
+        <tr><td><strong>Upload Screen</strong></td><td>Centered single column, max-w 640px</td><td>Generous whitespace from Open Resume. Drag-and-drop upload zone prominent. JD textarea below. Single next button. No distractions.</td></tr>
+        <tr><td><strong>Results Dashboard</strong></td><td>3-column on desktop, stacked mobile</td><td>Left: parsed resume profile. Center: match score ring + breakdown bars. Right: JD keyword panel. Influenced by Resume-Matcher dashboard layout.</td></tr>
+        <tr><td><strong>Batch Comparison</strong></td><td>Data table, full width</td><td>Influenced by Abdul Talha's data-first style. Sortable table, score badges, export action bar at top. Sticky header.</td></tr>
+        <tr><td><strong>Candidate Profile</strong></td><td>Two-column, sidebar + main</td><td>Left sidebar: skills tags, education timeline. Main: experience cards, keyword highlights inline in text.</td></tr>
+        <tr><td><strong>Settings</strong></td><td>Sidebar nav + content area</td><td>Clean section list, form-based, Open Resume's minimal sensibility. No visual clutter.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 8. Voice & Tone -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <span class="section-title">Voice, tone & copywriting rules</span>
+    </div>
+    <div class="component-grid">
+      <div class="comp-card">
+        <div class="comp-label">Personality spectrum</div>
+        <div style="font-size:12px; color:var(--color-text-secondary); line-height:1.7;">
+          Borrowed from Resume-Matcher's playful boldness — not stuffy, not silly. Direct and confident. Empathetic to job seekers, efficient for HR. Never condescending. Always clear over clever.
+        </div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-label">Do / don't examples</div>
+        <div style="font-size:12px; color:var(--color-text-secondary); display:flex; flex-direction:column; gap:6px;">
+          <div><span style="color:#059669; font-weight:500;">✓</span> "Missing 3 required skills."</div>
+          <div><span style="color:#DC2626; font-weight:500;">✗</span> "Unfortunately we were unable to detect the required skills."</div>
+          <div><span style="color:#059669; font-weight:500;">✓</span> "Strong match. Go apply."</div>
+          <div><span style="color:#DC2626; font-weight:500;">✗</span> "Your candidate profile is highly compatible."</div>
+        </div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-label">Empty states</div>
+        <div style="font-size:12px; color:var(--color-text-secondary); line-height:1.6;">
+          Friendly and action-oriented. "No resumes yet — drop one above to start." Never "No data found." Always suggest the next step.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. Accessibility -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">09</span>
+      <span class="section-title">Accessibility requirements</span>
+    </div>
+    <table class="spec-table">
+      <thead><tr><th>Requirement</th><th>Target</th></tr></thead>
+      <tbody>
+        <tr><td>Color contrast — body text</td><td>≥ 4.5:1 (WCAG AA) — #475569 on white = 5.9:1 ✓</td></tr>
+        <tr><td>Color contrast — large text</td><td>≥ 3:1 — #6366F1 on white = 4.4:1 ✓</td></tr>
+        <tr><td>Focus rings</td><td>3px indigo ring on all interactive elements, no outline:none without replacement</td></tr>
+        <tr><td>Score indicators</td><td>Never color alone — always paired with icon + text label (match/missing/partial)</td></tr>
+        <tr><td>Motion</td><td>All animations respect prefers-reduced-motion: reduce</td></tr>
+        <tr><td>Keyboard navigation</td><td>Full keyboard support, logical tab order, skip-to-main link</td></tr>
+        <tr><td>Screen reader</td><td>ARIA labels on score rings, progress bars, and drag-drop zones. Live regions for parse completion.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 10. Tech Stack -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">10</span>
+      <span class="section-title">Recommended tech stack</span>
+    </div>
+    <table class="spec-table">
+      <thead><tr><th>Layer</th><th>Choice</th><th>Rationale</th></tr></thead>
+      <tbody>
+        <tr><td>Framework</td><td>Next.js 14 (App Router)</td><td>Same stack as Resume-Matcher v2; SSR for fast first load on results pages</td></tr>
+        <tr><td>Styling</td><td>Tailwind CSS v4 + CSS vars</td><td>Open Resume's approach; token-based design scales well; Tailwind utility classes for density control</td></tr>
+        <tr><td>Component lib</td><td>shadcn/ui (headless)</td><td>Unstyled primitives + full control; matches our exact design language</td></tr>
+        <tr><td>Icons</td><td>Tabler Icons (outline)</td><td>2000+ consistent outline icons; NPM package; tree-shakeable</td></tr>
+        <tr><td>Animation</td><td>Framer Motion</td><td>Score ring counter, stagger reveals, drag interaction for upload</td></tr>
+        <tr><td>Charts</td><td>Recharts</td><td>Lightweight, React-first; used for score breakdowns and batch comparison</td></tr>
+        <tr><td>Fonts</td><td>Geist (Vercel) via next/font</td><td>Modern, ATS-friendly, free, excellent small-size rendering</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+function playMotion(id, cls) {
+  const bar = document.getElementById(id);
+  bar.style.width = '0%';
+  bar.style.transition = 'none';
+  setTimeout(() => {
+    bar.style.transition = '';
+    bar.style.width = '85%';
+    setTimeout(() => {
+      bar.style.width = '0%';
+    }, 1800);
+  }, 50);
+}
+setTimeout(() => {
+  ['bar-ease-out','bar-spring','bar-linear','bar-ease-in'].forEach((id,i) => {
+    setTimeout(() => playMotion(id, ''), i * 200);
+  });
+}, 600);
+</script>
