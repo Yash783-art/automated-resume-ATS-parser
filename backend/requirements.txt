@@ -1,0 +1,49 @@
+# ─── Web Framework ───────────────────────────────────────────────────────────
+fastapi==0.115.12
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+
+# ─── PDF Extraction ───────────────────────────────────────────────────────────
+pymupdf==1.25.5           # PyMuPDF (fitz) — text-based PDF extraction
+pytesseract==0.3.13       # Tesseract OCR Python wrapper
+opencv-python==4.11.0.86  # Image pre-processing (deskew, denoise, binarise)
+Pillow==11.2.1            # Image handling for Tesseract
+
+# ─── NLP Pipeline ────────────────────────────────────────────────────────────
+spacy==3.8.5              # NLP + custom NER pipeline
+sentence-transformers==4.1.0  # MiniLM-L6-v2 semantic similarity scoring
+numpy==2.2.5
+
+# ─── Database ────────────────────────────────────────────────────────────────
+sqlalchemy==2.0.40
+psycopg2-binary==2.9.10   # PostgreSQL driver
+alembic==1.15.2           # DB migrations
+
+# ─── File Storage (Cloudflare R2 / S3-compatible) ────────────────────────────
+boto3==1.38.13
+
+# ─── Task Queue ──────────────────────────────────────────────────────────────
+celery==5.5.2
+redis==5.3.0              # Celery broker + result backend
+
+# ─── Auth (Clerk server-side verification) ───────────────────────────────────
+PyJWT==2.9.0
+cryptography==44.0.3
+
+# ─── Export ──────────────────────────────────────────────────────────────────
+reportlab==4.4.1          # PDF report generation
+
+# ─── Observability ───────────────────────────────────────────────────────────
+sentry-sdk[fastapi]==2.26.1
+prometheus-fastapi-instrumentator==7.1.0
+
+# ─── Utilities ───────────────────────────────────────────────────────────────
+python-dotenv==1.1.0
+pydantic==2.11.4
+pydantic[email]==2.11.4
+pydantic-settings==2.9.1
+
+# ─── Testing ─────────────────────────────────────────────────────────────────
+pytest==8.3.5
+pytest-asyncio==0.26.0
+httpx==0.28.1             # Async HTTP client for FastAPI test client
